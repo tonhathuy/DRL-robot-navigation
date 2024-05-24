@@ -1,4 +1,4 @@
-FROM osrf/ros:noetic-desktop-full
+FROM rwthika/ros-torch:noetic-desktop-torch1.11.0-py-v23.06b
 
 # Add vscode user with same UID and GID as your host system
 # (copied from https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user#_creating-a-nonroot-user)
@@ -23,7 +23,7 @@ RUN sudo apt update && sudo apt upgrade -y
 # Install Git
 RUN sudo apt install -y git
 
-RUN sudo apt install ros-noetic-ros-control ros-noetic-ros-controllers -y
+# RUN sudo apt install ros-noetic-ros-control ros-noetic-ros-controllers -y
 # Rosdep update
 RUN rosdep update
 
