@@ -1,31 +1,24 @@
-FROM rwthika/ros-torch:noetic-desktop-torch1.11.0-py-v23.06b
+FROM nvcr.io/nvidia/pytorch:21.10-py3
 
-# Add vscode user with same UID and GID as your host system
-# (copied from https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user#_creating-a-nonroot-user)
-ARG USERNAME=vscode
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && apt-get update \
-    && apt-get install -y sudo \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME
-# Switch from root to user
-USER $USERNAME
+# Timezone
+RUN echo 'Asia/Ho_Chi_Minh' > /etc/timezone && \
+    ln -s /usr/share/zoneinfo/Etc/UTC /etc/localtime  
 
-# Add user to video group to allow access to webcam
-RUN sudo usermod --append --groups video $USERNAME
+# Essential packages
+RUN apt-get update && apt-get install -y --no-install-recommends\
+    build-essential curl 
 
-# Update all packages
-RUN sudo apt update && sudo apt upgrade -y
+# ROS
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu focal main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
 
-# Install Git
-RUN sudo apt install -y git
 
-# RUN sudo apt install ros-noetic-ros-control ros-noetic-ros-controllers -y
-# Rosdep update
-RUN rosdep update
+RUN apt-get update && apt-get install -y --fix-missing --no-install-recommends\
+    ros-noetic-desktop-full 
+RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && . ~/.bashrc
+
+RUN pip install empy catkin_pkg rosdep rosinstall rosinstall-generator wstool
+RUN rosdep init && rosdep update
 
 # Source the ROS setup file
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
