@@ -19,6 +19,3 @@ RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc && . ~/.bashrc
 
 RUN pip install empy catkin_pkg rosdep rosinstall rosinstall-generator wstool
 RUN rosdep init && rosdep update
-
-# Source the ROS setup file
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
